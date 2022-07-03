@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const roomsTemplateCopy = require('../models');
+const roomsTemplateCopy = require('../models/roomTemplate');
 
 router.post('/createRoom', (request, response) => {
     //response.send('send');

@@ -4,21 +4,11 @@ var MongoClient = require('mongodb').MongoClient;
 
 
 const router = express.Router();
-//const roomsTemplateCopy = require('../models');
-
-
-
-
-
+const chatTemplateCopy = require('./models/chatSchema');
 
 const app = express();
 app.use(express.json());
 
-// mongoose.connect("mongodb+srv://ashokdb:guruji123@cluster0.fk7mwgq.mongodb.net/?retryWrites=true&w=majority", {
-//     useNewUrlParser: true,
-//     useFindAndModify: false,
-//     useUnifiedTopology: true
-//   });
 
 
 
@@ -27,21 +17,18 @@ app.use(express.json());
   MongoClient.connect(url, function(err, db) {
     if (err)  throw err ;
 
-    console.log("Mongo DB Connection created!");
+    console.log("Mongo DB Connection made!");
 
-    var db1 = db.db("myFirstDB");
-    console.log("Database Created!");
+    // var db1 = db.db("mySecondDB");
+    console.log("Database Connected!");
 
-    // db1.createCollection("myIntRooms", function(err, res) { 
-    //                                     if (err) throw err 
-    //                                 });
-     
-    // var roomInfo = {
-    //   roomType: "1234"
-      
-    // }
-
-    
+    const db1 = mongoose.connection;
+    //db1.collection("myChats");
+ 
+    db1.once("open", function() {
+            const messageCollection = db1.collection("myChats");
+            const changeStream = messageCollection.watch();
+    } )
 
     router.post('/createRoom', (request, response) => {
 
@@ -49,29 +36,29 @@ app.use(express.json());
       db1.collection("myIntRooms").insertOne(roomInfo, function(err, res) {
         if (err) throw err ;
         console.log("one row inserted");
-      });
+      })
+    }
+    );
 
 
 
-      //response.send('send');
-      // const signedUpUser = new roomsTemplateCopy ({
-         
-      //     roomName:request.body.roomName
-          
-      // })
-  })
-
+    app.post("/messages/new", (req, res) =>  {
+      const dbMessage = req.body;
+      chatTemplateCopy.create(dbMessage, (err, data) => { 
+            if (err) { res.status(500).send(err)}
+            else { 
+              res.status(201).send(`New message created ${data}`)
+            }
+      } )
+})
 
     
-    // db.close();
-  });
+   });
+  
 
 
-// const db = mongoose.connection();
-// db.on("error", console.log("Error occurred!"));
-// db.once("open", function() { console.log("DB Connected Successfully")} );
 
-app.listen(5000, ()=>{
+   app.listen(5000, ()=>{
     console.log("Server Started!")
-});
+})
 

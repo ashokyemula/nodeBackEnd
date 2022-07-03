@@ -3,7 +3,7 @@ const mongoose  = require('mongoose');
 const roomsTemplate = new mongoose.Schema({
    
     roomName:{
-        type:Integer,
+        type:String,
         required:true
     },
 
@@ -12,5 +12,7 @@ const roomsTemplate = new mongoose.Schema({
         default:Date.now
     }
 })
+
+
 
 module.exports = mongoose.model('myRooms', roomsTemplate);
